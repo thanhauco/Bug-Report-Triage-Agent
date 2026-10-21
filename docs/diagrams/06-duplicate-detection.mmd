@@ -1,0 +1,44 @@
+%% Retrieval shortlists, the LLM decides, the router verifies
+flowchart TB
+    subgraph retrieve ["1 · Retrieve · LexicalDuplicateFinder"]
+        direction LR
+        K[("Known issues
+        JSON or GitHub")]:::store --> T1["tokenize
+        title weight x2"]:::tool
+        T1 --> IDF["IDF table and
+        TF-IDF vectors"]:::tool
+        I(["New issue"]):::term --> T2["tokenize"]:::tool
+        T2 --> Q["query vector"]:::tool
+        IDF --> COS["cosine
+        similarity"]:::tool
+        Q --> COS
+        COS --> TH{"score at
+        least 0.25?"}:::decision
+        TH -- no --> DROP(["discarded"]):::reject
+        TH -- yes --> TOP["top 5
+        candidates"]:::ok
+    end
+
+    subgraph decide ["2 · Decide and verify"]
+        direction LR
+        LLM("classify
+        fast model"):::llm --> CHK{"duplicate_of in
+        the shortlist?"}:::decision
+        CHK -- yes --> MD["mark_duplicate"]:::ok
+        CHK -- "no: invented number" --> LC["locate_code
+        treat as a bug"]:::tool
+    end
+
+    retrieve == "candidates in the prompt" ==> decide
+
+    classDef llm fill:#4D7FEE,stroke:#2B5BC9,stroke-width:1.5px,color:#0B1530
+    classDef tool fill:#69D0BF,stroke:#2F8F7E,stroke-width:1.5px,color:#0B2A25
+    classDef ok fill:#69D0BF,stroke:#1F6E61,stroke-width:3px,color:#0B2A25
+    classDef decision fill:#EC8131,stroke:#B85E1C,stroke-width:1.5px,color:#2A1405
+    classDef gate fill:#EC8131,stroke:#8A4512,stroke-width:3px,color:#2A1405
+    classDef term fill:#F3EFE6,stroke:#9C9585,stroke-width:1.5px,color:#1F2328
+    classDef store fill:#F3EFE6,stroke:#4D7FEE,stroke-width:2px,color:#1F2328
+    classDef external fill:#E94E5E,stroke:#B3303E,stroke-width:1.5px,color:#2A0508
+    classDef reject fill:#FFFFFF,stroke:#E94E5E,stroke-width:2px,stroke-dasharray:5 4,color:#B3303E
+    style retrieve fill:#F2FBF9,stroke:#2F8F7E
+    style decide fill:#EEF3FD,stroke:#4D7FEE

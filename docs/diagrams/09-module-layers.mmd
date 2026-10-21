@@ -1,0 +1,35 @@
+%% Package layers. Every import points to the same layer or a lower one.
+flowchart TB
+    subgraph L1 ["1 · Entry points"]
+        direction LR
+        cli["cli.py"]:::term ~~~ main["__main__.py"]:::term ~~~ init["__init__.py"]:::term
+    end
+    subgraph L2 ["2 · Orchestration"]
+        direction LR
+        graph_["graph.py"]:::decision ~~~ routing["routing.py"]:::decision ~~~ nodes["nodes.py"]:::tool
+    end
+    subgraph L3 ["3 · Building blocks"]
+        direction LR
+        llm["llm.py"]:::llm ~~~ prompts["prompts.py"]:::llm ~~~ comments["comments.py"]:::tool ~~~ tools_["tools/"]:::tool
+    end
+    subgraph L4 ["4 · Foundation"]
+        direction LR
+        state[("state.py")]:::store ~~~ models[("models.py")]:::store ~~~ text["text.py"]:::tool ~~~ config["config.py"]:::term
+    end
+    L1 == imports ==> L2
+    L2 == imports ==> L3
+    L3 == imports ==> L4
+
+    classDef llm fill:#4D7FEE,stroke:#2B5BC9,stroke-width:1.5px,color:#0B1530
+    classDef tool fill:#69D0BF,stroke:#2F8F7E,stroke-width:1.5px,color:#0B2A25
+    classDef ok fill:#69D0BF,stroke:#1F6E61,stroke-width:3px,color:#0B2A25
+    classDef decision fill:#EC8131,stroke:#B85E1C,stroke-width:1.5px,color:#2A1405
+    classDef gate fill:#EC8131,stroke:#8A4512,stroke-width:3px,color:#2A1405
+    classDef term fill:#F3EFE6,stroke:#9C9585,stroke-width:1.5px,color:#1F2328
+    classDef store fill:#F3EFE6,stroke:#4D7FEE,stroke-width:2px,color:#1F2328
+    classDef external fill:#E94E5E,stroke:#B3303E,stroke-width:1.5px,color:#2A0508
+    classDef reject fill:#FFFFFF,stroke:#E94E5E,stroke-width:2px,stroke-dasharray:5 4,color:#B3303E
+    style L1 fill:#FBFAF6,stroke:#C9C2B2
+    style L2 fill:#FEF5EE,stroke:#EC8131
+    style L3 fill:#EEF3FD,stroke:#4D7FEE
+    style L4 fill:#F2FBF9,stroke:#2F8F7E

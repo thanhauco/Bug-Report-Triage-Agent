@@ -8,29 +8,9 @@ A [LangGraph](https://langchain-ai.github.io/langgraph/) agent that triages bug 
 
 A human approves, edits or rejects every comment before it is posted. LLM calls go through [OpenRouter](https://openrouter.ai), so any model it serves can be used.
 
-```mermaid
-flowchart LR
-    S([Bug report]):::term --> FD[find_duplicates]:::tool --> C[classify]:::llm --> R{category}:::decision
-    R -- needs_info --> RI[request_info]:::llm
-    R -- duplicate --> MD[mark_duplicate]:::tool
-    R -- real_bug --> LC[locate_code]:::tool --> DP[draft_plan]:::llm --> RP[review_plan]:::llm
-    RP -- "problems, retry" --> DP
-    RP -- approved --> WC[write_plan_comment]:::tool
-    RI --> HR{{human_review}}:::decision
-    MD --> HR
-    WC --> HR
-    HR -- "approve / edit" --> PC[post_comment]:::external
-    HR -- reject --> X([nothing posted]):::reject
+![Triage workflow](docs/diagrams/01-workflow.svg)
 
-    classDef llm fill:#4D7FEE,stroke:#2F5BC4,color:#0B1530
-    classDef tool fill:#69D0BF,stroke:#3A9E8D,color:#0B2A25
-    classDef decision fill:#EC8131,stroke:#B85E1C,color:#2A1405
-    classDef term fill:#F3EFE6,stroke:#9C9585,color:#2B2B2B
-    classDef external fill:#E94E5E,stroke:#B3303E,color:#2A0508
-    classDef reject fill:#F3EFE6,stroke:#E94E5E,color:#B3303E,stroke-width:2px,stroke-dasharray:4 3
-```
-
-<sub>Blue: LLM call · Teal: tool or template · Orange: decision · Coral: external side effect</sub>
+![Colour and shape key](docs/diagrams/00-colour-key.svg)
 
 ## Features
 
@@ -159,10 +139,12 @@ ruff check . && ruff format --check .
 
 The tests run the real graph with a scripted fake model and stub tools, so they need no API key or network access. CI runs lint and tests on Python 3.10 to 3.13.
 
+Diagrams are Mermaid sources in `docs/diagrams/*.mmd`. After editing one, run `scripts/render-diagrams.sh` (needs Node.js) to regenerate its SVG.
+
 ## Documentation
 
 - [ARCHITECTURE.md](ARCHITECTURE.md): components, nodes, routing rules and design decisions
-- [docs/diagrams.md](docs/diagrams.md): workflow, system architecture, sequence, state machine, data-flow, data model and module diagrams
+- [docs/diagrams.md](docs/diagrams.md): nine diagrams covering the workflow, system architecture, a full run, the review loop, human review, duplicate detection, code search, the data model and module layers
 
 ## Project layout
 
@@ -182,5 +164,6 @@ src/triage_agent/
   tools/          duplicate finder, code searcher, GitHub client and posters
 tests/            unit and end-to-end graph tests
 examples/         sample report and known-issues corpus
-docs/             diagrams
+docs/             diagram sources (.mmd) and rendered SVGs
+scripts/          render-diagrams.sh
 ```

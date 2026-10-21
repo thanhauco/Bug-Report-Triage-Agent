@@ -1,0 +1,40 @@
+%% Draft/review loop. revisions is reset by locate_code and incremented by each draft.
+flowchart TB
+    subgraph loop ["1 · Draft and review"]
+        direction LR
+        S(( )):::start --> L["Locating
+        revisions = 0"]:::tool
+        L --> D("Drafting
+        revisions + 1"):::llm
+        D -- "plan written" --> R("Reviewing"):::llm
+        R -- "problems and
+        revisions below N" --> D
+    end
+
+    subgraph exit ["2 · Leave the loop"]
+        direction LR
+        Q{"critique
+        approved?"}:::decision
+        Q -- yes --> A["Approved"]:::ok
+        Q -- "no, and
+        revisions = N" --> X["Exhausted
+        open problems listed"]:::external
+        A --> C["Commenting
+        write_plan_comment"]:::term
+        X --> C
+        C --> H{{"human_review"}}:::gate
+    end
+
+    loop == "approved, or
+    revisions = N" ==> exit
+
+    classDef llm fill:#4D7FEE,stroke:#2B5BC9,stroke-width:1.5px,color:#0B1530
+    classDef tool fill:#69D0BF,stroke:#2F8F7E,stroke-width:1.5px,color:#0B2A25
+    classDef ok fill:#69D0BF,stroke:#1F6E61,stroke-width:3px,color:#0B2A25
+    classDef decision fill:#EC8131,stroke:#B85E1C,stroke-width:1.5px,color:#2A1405
+    classDef gate fill:#EC8131,stroke:#8A4512,stroke-width:3px,color:#2A1405
+    classDef term fill:#F3EFE6,stroke:#9C9585,stroke-width:1.5px,color:#1F2328
+    classDef external fill:#E94E5E,stroke:#B3303E,stroke-width:1.5px,color:#2A0508
+    classDef start fill:#3A3F4B,stroke:#3A3F4B
+    style loop fill:#EEF3FD,stroke:#4D7FEE
+    style exit fill:#FBFAF6,stroke:#C9C2B2

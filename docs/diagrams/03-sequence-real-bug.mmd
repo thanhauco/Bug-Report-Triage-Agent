@@ -1,0 +1,52 @@
+%% One run for a report classified as real_bug, from first invoke to the posted comment
+sequenceDiagram
+    actor Rev as Reviewer
+    box rgb(243,239,230) Agent process
+        participant CLI as CLI
+        participant G as LangGraph
+        participant CP as Checkpointer
+    end
+    box rgb(225,246,242) Tools
+        participant DF as DuplicateFinder
+        participant CS as CodeSearcher
+    end
+    box rgb(222,231,252) LLMs via OpenRouter
+        participant FM as Fast model
+        participant MM as Main model
+    end
+    box rgb(252,226,229) External
+        participant GH as GitHub
+    end
+
+    CLI->>G: invoke({issue}, thread_id)
+    G->>DF: find(issue)
+    DF-->>G: duplicate candidates
+    G->>FM: classify → Classification
+    FM-->>G: real_bug
+    G->>CS: search(identifiers from issue)
+    CS-->>G: code hits
+
+    rect rgb(222,231,252)
+        loop until approved or N drafts
+            G->>MM: draft_plan → FixPlan
+            MM-->>G: plan
+            G->>FM: review_plan → Critique
+            FM-->>G: approved, or problems
+        end
+    end
+
+    G->>CP: save state, interrupt()
+    G-->>CLI: paused at human_review
+    CLI->>Rev: show draft comment
+    rect rgb(253,236,222)
+        Rev-->>CLI: approve, edit or reject
+    end
+    CLI->>G: Command(resume=decision)
+    G->>CP: load state
+    alt approve or edit
+        G->>GH: POST /issues/N/comments
+        GH-->>G: comment URL
+    else reject
+        Note over G,GH: nothing is posted
+    end
+    G-->>CLI: final state

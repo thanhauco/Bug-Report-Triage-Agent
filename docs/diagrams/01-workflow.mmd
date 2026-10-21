@@ -1,0 +1,64 @@
+%% LangGraph workflow, as wired in src/triage_agent/graph.py
+flowchart TB
+    subgraph intake ["1 · Intake"]
+        direction LR
+        S([Bug report]):::term --> FD["find_duplicates
+        TF-IDF shortlist"]:::tool
+        FD --> C("classify
+        fast model"):::llm
+    end
+
+    subgraph outcomes ["2 · Triage outcomes"]
+        direction LR
+        R1{"route after
+        classify"}:::decision
+        R1 -- needs_info --> RI("request_info
+        main model"):::llm
+        R1 -- "duplicate of a
+        retrieved candidate" --> MD["mark_duplicate
+        template"]:::tool
+        R1 -- "real_bug, or
+        unverified duplicate" --> LC
+        subgraph loop ["Fix-plan loop · at most N drafts"]
+            direction LR
+            LC["locate_code
+            search source tree"]:::tool --> DP("draft_plan
+            main model"):::llm
+            DP --> RP("review_plan
+            fast model"):::llm
+            RP --> R2{"route after
+            review"}:::decision
+            R2 -- "problems,
+            drafts below N" --> DP
+        end
+        R2 -- "approved or
+        N drafts" --> WC["write_plan_comment
+        template"]:::tool
+    end
+
+    subgraph gate ["3 · Human gate"]
+        direction LR
+        HR{{"human_review
+        interrupt()"}}:::gate --> R3{"route after
+        human"}:::decision
+        R3 -- "approve / edit" --> PC[/"post_comment"/]:::external
+        PC --> E([END]):::term
+        R3 -- reject --> X(["END
+        nothing posted"]):::reject
+    end
+
+    intake == "classification" ==> outcomes
+    outcomes == "draft_comment from
+    every branch" ==> gate
+
+    classDef llm fill:#4D7FEE,stroke:#2B5BC9,stroke-width:1.5px,color:#0B1530
+    classDef tool fill:#69D0BF,stroke:#2F8F7E,stroke-width:1.5px,color:#0B2A25
+    classDef decision fill:#EC8131,stroke:#B85E1C,stroke-width:1.5px,color:#2A1405
+    classDef gate fill:#EC8131,stroke:#8A4512,stroke-width:3px,color:#2A1405
+    classDef term fill:#F3EFE6,stroke:#9C9585,stroke-width:1.5px,color:#1F2328
+    classDef external fill:#E94E5E,stroke:#B3303E,stroke-width:1.5px,color:#2A0508
+    classDef reject fill:#FFFFFF,stroke:#E94E5E,stroke-width:2px,stroke-dasharray:5 4,color:#B3303E
+    style intake fill:#FBFAF6,stroke:#C9C2B2
+    style outcomes fill:#FBFAF6,stroke:#C9C2B2
+    style loop fill:#EEF3FD,stroke:#4D7FEE
+    style gate fill:#FEF5EE,stroke:#EC8131

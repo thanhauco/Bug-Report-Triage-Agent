@@ -6,7 +6,9 @@ Bug-Report-Triage-Agent is a [LangGraph](https://langchain-ai.github.io/langgrap
 - It uses LLMs, through [OpenRouter](https://openrouter.ai), for classification, writing and self-review.
 - It always pauses for a human before anything leaves the process.
 
-All diagrams use one colour key. The full set is in [docs/diagrams.md](docs/diagrams.md).
+All diagrams use one colour and shape key. The full set of nine is in [docs/diagrams.md](docs/diagrams.md).
+
+![Colour and shape key](docs/diagrams/00-colour-key.svg)
 
 | **Colour** | **Meaning** |
 |---|---|
@@ -18,103 +20,11 @@ All diagrams use one colour key. The full set is in [docs/diagrams.md](docs/diag
 
 ## Workflow
 
-```mermaid
-flowchart LR
-    S([START]):::term --> FD[find_duplicates]:::tool --> C[classify]:::llm --> R1{route_after_classify}:::decision
-
-    subgraph outcomes [Triage outcomes]
-        direction TB
-        RI[request_info]:::llm
-        MD[mark_duplicate]:::tool
-        subgraph loop [Fix-plan loop, max N revisions]
-            direction LR
-            LC[locate_code]:::tool --> DP[draft_plan]:::llm --> RP[review_plan]:::llm --> R2{route_after_review}:::decision
-            R2 -- "problems, revisions below N" --> DP
-        end
-        R2 -- "approved or revisions = N" --> WC[write_plan_comment]:::tool
-    end
-
-    R1 -- needs_info --> RI
-    R1 -- "duplicate of a retrieved candidate" --> MD
-    R1 -- "real_bug, or unverified duplicate" --> LC
-
-    RI --> HR
-    MD --> HR
-    WC --> HR
-    HR{{"human_review<br/>interrupt()"}}:::decision --> R3{route_after_human}:::decision
-    R3 -- "approve / edit" --> PC[post_comment]:::external --> E([END]):::term
-    R3 -- reject --> E2([END]):::reject
-
-    classDef llm fill:#4D7FEE,stroke:#2F5BC4,color:#0B1530,stroke-width:1.5px
-    classDef tool fill:#69D0BF,stroke:#3A9E8D,color:#0B2A25,stroke-width:1.5px
-    classDef decision fill:#EC8131,stroke:#B85E1C,color:#2A1405,stroke-width:1.5px
-    classDef term fill:#F3EFE6,stroke:#9C9585,color:#2B2B2B,stroke-width:1.5px
-    classDef external fill:#E94E5E,stroke:#B3303E,color:#2A0508,stroke-width:1.5px
-    classDef reject fill:#F3EFE6,stroke:#E94E5E,color:#B3303E,stroke-width:2px,stroke-dasharray:4 3
-    style outcomes fill:#FBFAF6,stroke:#9C9585
-    style loop fill:#EEF3FD,stroke:#4D7FEE
-```
+![Workflow](docs/diagrams/01-workflow.svg)
 
 ## Components
 
-```mermaid
-flowchart LR
-    subgraph inputs [Entry points]
-        direction TB
-        CLI[["triage-agent CLI<br/>cli.py"]]:::term
-        API[["Python API<br/>build_graph()"]]:::term
-    end
-
-    subgraph core [Orchestration: triage_agent]
-        direction TB
-        G[Compiled StateGraph<br/>graph.py + routing.py]:::decision
-        N[TriageNodes<br/>nodes.py]:::tool
-        P[Prompts and comment templates<br/>prompts.py, comments.py]:::llm
-        CP[(Checkpointer<br/>InMemorySaver)]:::store
-        G -- "runs" --> N
-        N --> P
-        G <-- "state per thread_id" --> CP
-    end
-
-    subgraph tools [Tools, injected via Dependencies]
-        direction TB
-        DF[LexicalDuplicateFinder]:::tool
-        CS[FilesystemCodeSearcher]:::tool
-        PO[ConsolePoster / GitHubPoster]:::tool
-        GHC[GitHubClient]:::tool
-    end
-
-    subgraph external [External systems and data]
-        direction TB
-        OR[(OpenRouter API<br/>main + fast model)]:::external
-        GH[(GitHub REST API)]:::external
-        SRC[(Local source tree)]:::store
-        KI[(known_issues.json)]:::store
-    end
-
-    CLI -- "invoke / resume" --> G
-    API -- "invoke / resume" --> G
-    N -- "ChatOpenAI" --> OR
-    N --> DF
-    N --> CS
-    N --> PO
-    CS -. "--code-root" .-> SRC
-    CLI -. "--known-issues" .-> KI
-    CLI -. "--issue N, --repo" .-> GHC
-    PO -. "--post" .-> GHC
-    GHC --> GH
-
-    classDef llm fill:#4D7FEE,stroke:#2F5BC4,color:#0B1530
-    classDef tool fill:#69D0BF,stroke:#3A9E8D,color:#0B2A25
-    classDef decision fill:#EC8131,stroke:#B85E1C,color:#2A1405
-    classDef term fill:#F3EFE6,stroke:#9C9585,color:#2B2B2B
-    classDef store fill:#F3EFE6,stroke:#4D7FEE,color:#2B2B2B,stroke-width:2px
-    classDef external fill:#E94E5E,stroke:#B3303E,color:#2A0508
-    style inputs fill:#FBFAF6,stroke:#9C9585
-    style core fill:#FEF5EE,stroke:#EC8131
-    style tools fill:#F2FBF9,stroke:#3A9E8D
-    style external fill:#FDF1F2,stroke:#E94E5E
-```
+![System architecture](docs/diagrams/02-system-architecture.svg)
 
 | **Module** | **Responsibility** |
 |---|---|

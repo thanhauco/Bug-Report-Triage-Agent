@@ -1,0 +1,72 @@
+%% Pydantic models carried in TriageState
+classDiagram
+    direction TB
+    class TriageState {
+        Issue issue
+        list~DuplicateCandidate~ duplicate_candidates
+        list~CodeHit~ code_hits
+        Classification classification
+        FixPlan plan
+        Critique critique
+        int revisions
+        str draft_comment
+        ReviewDecision decision
+        str final_comment
+        str posted_url
+    }
+    class Issue {
+        str title
+        str body
+        int number
+        str url
+    }
+    class DuplicateCandidate {
+        int number
+        str title
+        float score
+    }
+    class CodeHit {
+        str path
+        int line
+        str snippet
+        float score
+    }
+    class Classification {
+        Category category
+        str rationale
+        int duplicate_of
+        list~str~ missing_info
+    }
+    class FixPlan {
+        str summary
+        str suspected_cause
+        list~str~ steps
+        list~str~ files
+        list~str~ tests
+        list~str~ risks
+        to_markdown() str
+    }
+    class Critique {
+        bool approved
+        list~str~ problems
+    }
+    class ReviewDecision {
+        ReviewAction action
+        str comment
+    }
+    TriageState *-- Issue
+    TriageState *-- "0..5" DuplicateCandidate
+    TriageState *-- "0..8" CodeHit
+    TriageState *-- Classification
+    TriageState *-- FixPlan
+    TriageState *-- Critique
+    TriageState *-- ReviewDecision
+
+    style TriageState fill:#F3EFE6,stroke:#9C9585,color:#1F2328
+    style Issue fill:#F3EFE6,stroke:#9C9585,color:#1F2328
+    style DuplicateCandidate fill:#69D0BF,stroke:#2F8F7E,color:#0B2A25
+    style CodeHit fill:#69D0BF,stroke:#2F8F7E,color:#0B2A25
+    style Classification fill:#4D7FEE,stroke:#2B5BC9,color:#0B1530
+    style FixPlan fill:#4D7FEE,stroke:#2B5BC9,color:#0B1530
+    style Critique fill:#4D7FEE,stroke:#2B5BC9,color:#0B1530
+    style ReviewDecision fill:#EC8131,stroke:#B85E1C,color:#2A1405

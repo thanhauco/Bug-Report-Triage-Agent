@@ -1,0 +1,14 @@
+%% Colour and shape key shared by every diagram in this project
+flowchart LR
+    A("LLM call"):::llm ~~~ B["Tool or template"]:::tool ~~~ C{"Decision"}:::decision ~~~ D{{"Human gate"}}:::gate
+    D ~~~ E[("State or data")]:::store ~~~ F[/"External side effect"/]:::external ~~~ G(["Rejected, no-op"]):::reject
+
+    classDef llm fill:#4D7FEE,stroke:#2B5BC9,stroke-width:1.5px,color:#0B1530
+    classDef tool fill:#69D0BF,stroke:#2F8F7E,stroke-width:1.5px,color:#0B2A25
+    classDef ok fill:#69D0BF,stroke:#1F6E61,stroke-width:3px,color:#0B2A25
+    classDef decision fill:#EC8131,stroke:#B85E1C,stroke-width:1.5px,color:#2A1405
+    classDef gate fill:#EC8131,stroke:#8A4512,stroke-width:3px,color:#2A1405
+    classDef term fill:#F3EFE6,stroke:#9C9585,stroke-width:1.5px,color:#1F2328
+    classDef store fill:#F3EFE6,stroke:#4D7FEE,stroke-width:2px,color:#1F2328
+    classDef external fill:#E94E5E,stroke:#B3303E,stroke-width:1.5px,color:#2A0508
+    classDef reject fill:#FFFFFF,stroke:#E94E5E,stroke-width:2px,stroke-dasharray:5 4,color:#B3303E
