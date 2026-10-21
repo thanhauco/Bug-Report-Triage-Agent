@@ -1,0 +1,17 @@
+[
+  {
+    "number": 101,
+    "title": "Dark mode toggle does not persist after reload",
+    "body": "Switching to dark mode works until the page is refreshed."
+  },
+  {
+    "number": 117,
+    "title": "KeyError 'network' in load_config after upgrade",
+    "body": "ConfigLoader crashes when settings.yaml has no network section (configs created before v2.3)."
+  },
+  {
+    "number": 123,
+    "title": "CSV export drops the last row",
+    "body": "Exporting a report to CSV loses the final line when the table has an odd number of rows."
+  }
+]
