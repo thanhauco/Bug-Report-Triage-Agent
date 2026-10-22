@@ -6,7 +6,7 @@ Bug-Report-Triage-Agent is a [LangGraph](https://langchain-ai.github.io/langgrap
 - It uses LLMs, through [OpenRouter](https://openrouter.ai), for classification, writing and self-review.
 - It always pauses for a human before anything leaves the process.
 
-All diagrams use one colour and shape key. The full set of nine is in [docs/diagrams.md](docs/diagrams.md).
+All diagrams use one colour and shape key. The full set of ten is in [docs/diagrams.md](docs/diagrams.md).
 
 ![Colour and shape key](docs/diagrams/00-colour-key.svg)
 

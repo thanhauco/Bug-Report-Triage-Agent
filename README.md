@@ -8,9 +8,11 @@ A [LangGraph](https://langchain-ai.github.io/langgraph/) agent that triages bug 
 
 A human approves, edits or rejects every comment before it is posted. LLM calls go through [OpenRouter](https://openrouter.ai), so any model it serves can be used.
 
-![Triage workflow](docs/diagrams/01-workflow.svg)
+![How the triage agent works](docs/diagrams/10-readme-overview.svg)
 
 ![Colour and shape key](docs/diagrams/00-colour-key.svg)
+
+The node-by-node LangGraph workflow, system architecture and the other diagrams are in [docs/diagrams.md](docs/diagrams.md).
 
 ## Features
 
@@ -144,7 +146,7 @@ Diagrams are Mermaid sources in `docs/diagrams/*.mmd`. After editing one, run `s
 ## Documentation
 
 - [ARCHITECTURE.md](ARCHITECTURE.md): components, nodes, routing rules and design decisions
-- [docs/diagrams.md](docs/diagrams.md): nine diagrams covering the workflow, system architecture, a full run, the review loop, human review, duplicate detection, code search, the data model and module layers
+- [docs/diagrams.md](docs/diagrams.md): ten diagrams covering a plain-language overview, the workflow, system architecture, a full run, the review loop, human review, duplicate detection, code search, the data model and module layers
 
 ## Project layout
 

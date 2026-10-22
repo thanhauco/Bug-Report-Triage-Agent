@@ -28,6 +28,7 @@ Each diagram is an editable Mermaid source in [`diagrams/`](diagrams/) with a re
 | 7 | [Code search](#7-code-search) | Data flow | How relevant source files are found |
 | 8 | [Data model](#8-data-model) | Class / ERD | Pydantic models held in `TriageState` |
 | 9 | [Module layers](#9-module-layers) | Layered | Package structure and import direction |
+| 10 | [README overview](#10-readme-overview) | Flowchart | The workflow in plain language, for first-time readers |
 
 ---
 
@@ -118,3 +119,11 @@ Every import points to the same layer or a lower one, so tools and models can be
 | `tools` | `models`, `text` |
 | `state` | `models` |
 | `models`, `text`, `config` | nothing internal |
+
+## 10. README overview
+
+A plain-language version of the workflow for the README, in three phases. It leaves out node names and routing details, which are in [diagram 1](#1-workflow).
+
+![README overview](diagrams/10-readme-overview.svg)
+
+<sub>Source: [diagrams/10-readme-overview.mmd](diagrams/10-readme-overview.mmd)</sub>

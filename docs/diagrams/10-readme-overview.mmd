@@ -1,0 +1,66 @@
+%%{init: {"themeVariables": {"fontSize": "19px"}, "flowchart": {"nodeSpacing": 24, "rankSpacing": 38, "padding": 10, "diagramPadding": 12}}}%%
+%% High-level overview for the README. The node-level graph is 01-workflow.mmd.
+flowchart LR
+    subgraph understand ["1 · Understand"]
+        direction TB
+        IN(["Bug report"]):::input
+        PI[("Past issues")]:::store
+        SIM["Find similar
+        issues"]:::tool
+        CL("Classify
+        fast model"):::llm
+        IN ~~~ PI
+        PI --> SIM
+        IN --> SIM
+        SIM --> CL
+    end
+
+    subgraph respond ["2 · Draft a response"]
+        direction TB
+        Q{"Category?"}:::decision
+        SRC[("Source tree")]:::store
+        Q -- "needs info" --> ASK("Ask for
+        missing details"):::llm
+        Q -- duplicate --> DUP["Link the
+        original"]:::tool
+        Q -- "real bug" --> CODE["Find
+        relevant code"]:::tool
+        SRC --> CODE
+        CODE --> fix
+        subgraph fix ["Fix plan · up to N rounds"]
+            direction LR
+            PLAN("Write plan
+            main model"):::llm -- draft --> REV("Review
+            fast model"):::llm
+            REV -- "changes
+            needed" --> PLAN
+        end
+    end
+
+    subgraph approve ["3 · Human approval"]
+        direction TB
+        H{{"Approve, edit
+        or reject"}}:::gate
+        H -- "approve
+        or edit" --> POST[/"Post
+        comment"/]:::external
+        H -- reject --> NONE(["Nothing
+        posted"]):::reject
+    end
+
+    understand ==> respond
+    respond == "draft
+    comment" ==> approve
+
+    classDef input fill:#F3EFE6,stroke:#9C9585,stroke-width:1.5px,color:#1F2328
+    classDef llm fill:#4D7FEE,stroke:#2B5BC9,stroke-width:1.5px,color:#0B1530
+    classDef tool fill:#69D0BF,stroke:#2F8F7E,stroke-width:1.5px,color:#0B2A25
+    classDef decision fill:#EC8131,stroke:#B85E1C,stroke-width:1.5px,color:#2A1405
+    classDef gate fill:#EC8131,stroke:#8A4512,stroke-width:3px,color:#2A1405
+    classDef store fill:#F3EFE6,stroke:#4D7FEE,stroke-width:2px,color:#1F2328
+    classDef external fill:#E94E5E,stroke:#B3303E,stroke-width:1.5px,color:#2A0508
+    classDef reject fill:#FFFFFF,stroke:#E94E5E,stroke-width:2px,stroke-dasharray:5 4,color:#B3303E
+    style understand fill:#FBFAF6,stroke:#C9C2B2
+    style respond fill:#F7F9FE,stroke:#4D7FEE
+    style fix fill:#E6EDFD,stroke:#4D7FEE
+    style approve fill:#FEF5EE,stroke:#EC8131
